@@ -38,9 +38,11 @@ struct GameView: View {
             }.padding()
                 .disabled(vm.isDisable)
                 .alert(item: $vm.alertItem, content: { alertItem in
-                    Alert(title: alertItem.title,
+                    return Alert(title: alertItem.title,
                           message: alertItem.message,
-                          dismissButton: .default(alertItem.buttonTitle, action: { vm.resetGame() }))
+                          dismissButton: .default(alertItem.buttonTitle, action: {
+                        print("***")
+                        vm.resetGame() }))
                      
                     
                 })

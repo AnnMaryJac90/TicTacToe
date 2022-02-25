@@ -29,6 +29,7 @@ final class GameViewModel: ObservableObject{
         }
         if checkDrawCondition(in: moves){
             alertItem = AlertContext.draw
+            resetGame()
         }
         isDisable = true
         DispatchQueue.main.asyncAfter(deadline: .now()+0.5){ [self] in
@@ -37,10 +38,11 @@ final class GameViewModel: ObservableObject{
             moves[machinePosition] = Move(player: .machine, index: machinePosition)
             if isWinner(for: .machine, in: self.moves){
                 alertItem = AlertContext.machineWin
-              
+               
              }
             if checkDrawCondition(in: moves){
                 alertItem = AlertContext.draw
+                
             }
             isDisable = false
         }
