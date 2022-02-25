@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  GameView.swift
 //  TicTacToe
 //
 //  Created by Anil Thomas on 2/23/22.
@@ -10,7 +10,7 @@ import SwiftUI
 
 
 
-struct ContentView: View {
+struct GameView: View {
     let coloums : [GridItem] = [GridItem(.flexible()),
                                 GridItem(.flexible()),
                                 GridItem(.flexible())]
@@ -34,20 +34,18 @@ struct ContentView: View {
                         Image(systemName: moves[i]?.indicator ?? "")
                             .resizable()
                             .frame(width: 40, height: 40, alignment: .center)
-                            
                     }
-                   
                     .onTapGesture {
-                        if checkDrawCondition(in: moves){
-                            alertItem = AlertContext.draw
-                        }
+                        
                         if isCircleOccupied(in: moves, at: i){
                             return
                         }
                         moves[i] = Move(player: .human, index: i)
                        if isWinner(for: .human, in: moves){
                            alertItem = AlertContext.humanWin
-                        
+                        }
+                        if checkDrawCondition(in: moves){
+                            alertItem = AlertContext.draw
                         }
                         isDisable = true
                         DispatchQueue.main.asyncAfter(deadline: .now()+0.5){
@@ -63,14 +61,10 @@ struct ContentView: View {
                             }
                             isDisable = false
                         }
-                       
                     }
                 }
-
-                
             }
                 Spacer()
-            
             }.padding()
                 .disabled(isDisable)
                 .alert(item: $alertItem, content: { alertItem in
@@ -89,16 +83,46 @@ struct ContentView: View {
     
     
     func determineMachineMovePosition(in moves: [Move?])-> Int{
-        //if AI can win, then win
-        //if AI can't win, block
-        //if can't block take middle
-    
         
-        //if AI can win, then win
        
+       
+        var winPattern : Set<Set<Int>> = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[6,4,2]]
+        //if AI can win, then win
+        let machineMoves = moves.compactMap{ $0 }.filter{$0.player == .machine}
+        let machinePosition = Set(machineMoves.map{$0.index})
+        print(machinePosition)
+       
+        for pattern in winPattern {
+            print("position is \(pattern.subtracting(machinePosition))")
+            let winPosition = pattern.subtracting(machinePosition)
+            if winPosition.count == 1 {
+                print("AI working")
+                let isAvailable = !isCircleOccupied(in: moves, at:winPosition.first! )
+                if isAvailable { return winPosition.first!}
+            }
+          
+        }
         
         
-        
+        //if AI can't win, block
+        let humanMoves = moves.compactMap{ $0 }.filter{$0.player == .human}
+        let humanPosition = Set(humanMoves.map{$0.index})
+        print(humanPosition)
+       
+        for pattern in winPattern {
+            print("position is \(pattern.subtracting(humanPosition))")
+            let winPosition = pattern.subtracting(humanPosition)
+            if winPosition.count == 1 {
+                print("AI working")
+                let isAvailable = !isCircleOccupied(in: moves, at:winPosition.first! )
+                if isAvailable { return winPosition.first!}
+            }
+          
+        }
+        //if can't block, take middle
+        let centerPosition = 4
+        let isAvailable = !isCircleOccupied(in: moves, at: centerPosition)
+        if isAvailable { return centerPosition }
         
         
         //otherwise take a random position
@@ -157,7 +181,7 @@ struct Move{
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        GameView()
     }
 }
 
